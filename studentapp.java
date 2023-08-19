@@ -1,148 +1,173 @@
-<?xml version="1.0" encoding="utf-8"?>
-<AbsoluteLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/img">
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="50dp"
-        android:layout_y="20dp"
-        android:text="Student Details"
-        android:textSize="30sp"
-        android:textColor="@color/white"/>
+package com.example.sdm;
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="20dp"
-        android:layout_y="110dp"
-        android:text="Enter Rollno:"
-        android:textSize="20sp"
-        android:textColor="@color/white"/>
+import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.app.AlertDialog.Builder;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.os.Bundle;
+import android.view.View;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
 
-    <EditText
-        android:id="@+id/Rollno"
-        android:layout_width="187dp"
-        android:layout_height="wrap_content"
-        android:layout_x="175dp"
-        android:layout_y="87dp"
-        android:digits="ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789"
-        android:hint="Enter the roll number"
-        android:inputType="number"
-        android:textColorHint="@color/white"
-        android:textSize="20sp" />
+public class MainActivity extends Activity implements OnClickListener
+{
+    EditText Rollno,Name,Marks,MA;
+    Button Insert,Delete,Update,View,ViewAll;
+    SQLiteDatabase db;
+    int avg=0;
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="20dp"
-        android:layout_y="160dp"
-        android:text="Enter Name:"
-        android:textSize="20sp"
-        android:textColor="@color/white"/>
+    @SuppressLint("MissingInflatedId")
+    @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
 
-    <EditText
-        android:id="@+id/Name"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="175dp"
-        android:layout_y="150dp"
-        android:inputType="text"
-        android:textSize="20sp"
-        android:hint="Enter the name"
-        android:textColorHint="@color/white"/>
+        Rollno=(EditText)findViewById(R.id.Rollno);
+        Name=(EditText)findViewById(R.id.Name);
+        Marks=(EditText)findViewById(R.id.Marks);
+        MA=(EditText)findViewById(R.id.Marks2);
+        Insert=(Button)findViewById(R.id.Insert);
+        Delete=(Button)findViewById(R.id.Delete);
+        Update=(Button)findViewById(R.id.Update);
+        View=(Button)findViewById(R.id.View);
+        ViewAll=(Button)findViewById(R.id.ViewAll);
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="20dp"
-        android:layout_y="210dp"
-        android:text="Enter Marks:"
-        android:textSize="20sp"
-        android:textColor="@color/white"/>
+        Insert.setOnClickListener(this);
+        Delete.setOnClickListener(this);
+        Update.setOnClickListener(this);
+        View.setOnClickListener(this);
+        ViewAll.setOnClickListener(this);
 
 
-    <EditText
-        android:id="@+id/Marks"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="175dp"
-        android:layout_y="200dp"
-        android:inputType="number"
-        android:textSize="20sp"
-        android:hint="Enter the marks"
-        android:textColorHint="@color/white"/>
+        db=openOrCreateDatabase("StudentDB", Context.MODE_PRIVATE, null);
+        db.execSQL("CREATE TABLE IF NOT EXISTS student1(rollno VARCHAR,name VARCHAR,marks VARCHAR,makrs2 VARCHAR);");
+    }
+    public void onClick(View view)
+    {
 
+        if(view==Insert)
+        {
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_x="20dp"
-        android:layout_y="261dp"
-        android:text="Enter Marks2:"
-        android:textColor="@color/white"
-        android:textSize="20sp" />
+            if(Rollno.getText().toString().trim().length()==0||
+                    Name.getText().toString().trim().length()==0||
+                    Marks.getText().toString().trim().length()==0 ||
+                    MA.getText().toString().trim().length()==0)
+            {
+                showMessage("Error", "Please enter all values");
+                return;
+            }
 
-    <EditText
-        android:id="@+id/Marks2"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="182dp"
-        android:layout_y="253dp"
-        android:hint="Enter the marks"
-        android:inputType="number"
-        android:textColorHint="@color/white"
-        android:textSize="20sp" />
+            db.execSQL("INSERT INTO student1 VALUES('"+Rollno.getText()+"','"+Name.getText()+
+                    "','"+Marks.getText()+"','"+MA.getText()+"');");
+            showMessage("Success", "Record added");
+            clearText();
+        }
 
-    <Button
-        android:id="@+id/Insert"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="50dp"
-        android:layout_y="308dp"
-        android:background="@drawable/rounded_rectangle"
-        android:text="Insert"
-        android:textSize="30dp" />
+        if(view==Delete)
+        {
 
-    <Button
-        android:id="@+id/Delete"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="208dp"
-        android:layout_y="306dp"
-        android:background="@drawable/rounded_rectangle"
-        android:text="Delete"
-        android:textSize="30dp" />
+            if(Rollno.getText().toString().trim().length()==0)
+            {
+                showMessage("Error", "Please enter Rollno");
+                return;
+            }
+            Cursor c=db.rawQuery("SELECT * FROM student1 WHERE rollno='"+Rollno.getText()+"'", null);
+            if(c.moveToFirst())
+            {
+                db.execSQL("DELETE FROM student1 WHERE rollno='"+Rollno.getText()+"'");
+                showMessage("Success", "Record Deleted");
+            }
+            else
+            {
+                showMessage("Error", "Invalid Rollno");
+            }
+            clearText();
+        }
 
-    <Button
-        android:id="@+id/Update"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="49dp"
-        android:layout_y="381dp"
-        android:background="@drawable/rounded_rectangle"
-        android:text="Update"
-        android:textSize="30dp" />
+        if(view==Update)
+        {
 
-    <Button
-        android:id="@+id/View"
-        android:layout_width="150dp"
-        android:layout_height="wrap_content"
-        android:layout_x="209dp"
-        android:layout_y="380dp"
-        android:background="@drawable/rounded_rectangle"
-        android:text="View"
-        android:textSize="30dp" />
+            if(Rollno.getText().toString().trim().length()==0)
+            {
+                showMessage("Error", "Please enter Rollno");
+                return;
+            }
+            Cursor c=db.rawQuery("SELECT * FROM student1 WHERE rollno='"+Rollno.getText()+"'", null);
+            if(c.moveToFirst()) {
+                db.execSQL("UPDATE student1 SET name='" + Name.getText() + "',marks='" + Marks.getText() + "',marks2='" + MA.getText() +
+                        "' WHERE rollno='"+Rollno.getText()+"'");
+                showMessage("Success", "Record Modified");
+            }
+            else {
+                showMessage("Error", "Invalid Rollno");
+            }
+            clearText();
+        }
 
-    <Button
-        android:id="@+id/ViewAll"
-        android:layout_width="200dp"
-        android:layout_height="wrap_content"
-        android:layout_x="118dp"
-        android:layout_y="450dp"
-        android:background="@drawable/rounded_rectangle"
-        android:text="View All"
-        android:textSize="30dp" />
+        if(view==View)
+        {
 
-</AbsoluteLayout>
+            if(Rollno.getText().toString().trim().length()==0)
+            {
+                showMessage("Error", "Please enter Rollno");
+                return;
+            }
+            Cursor c=db.rawQuery("SELECT * FROM student1 WHERE rollno='"+Rollno.getText()+"'", null);
+            if(c.moveToFirst())
+            {
+                Name.setText(c.getString(1));
+                Marks.setText(c.getString(2));
+                MA.setText(c.getString(3));
+            }
+            else
+            {
+                showMessage("Error", "Invalid Rollno");
+                clearText();
+            }
+        }
+
+        if(view==ViewAll)
+        {
+            Cursor c=db.rawQuery("SELECT * FROM student1", null);
+            if(c.getCount()==0)
+            {
+                showMessage("Error", "No records found");
+                return;
+            }
+            StringBuffer buffer=new StringBuffer();
+            int a1= Integer.parseInt(Marks.getText().toString());
+            int b1=Integer.parseInt((MA.getText().toString()));
+            avg = (a1+b1)/2;
+            while(c.moveToNext())
+            {
+                buffer.append("Rollno: "+c.getString(0)+"\n");
+                buffer.append("Name: "+c.getString(1)+"\n");
+                buffer.append("Marks: "+c.getString(2)+"\n\n");
+                buffer.append("Marks2 :"+c.getString(3)+"\n\n");
+
+                buffer.append("Avg:" +avg);
+            }
+            showMessage("Student Details", buffer.toString());
+        }
+    }
+    public void showMessage(String title,String message)
+    {
+        Builder builder=new Builder(this);
+        builder.setCancelable(true);
+        builder.setTitle(title);
+        builder.setMessage(message);
+        builder.show();
+    }
+    public void clearText()
+    {
+        Rollno.setText("");
+        Name.setText("");
+        Marks.setText("");
+        MA.setText("");
+        Rollno.requestFocus();
+    }
+}
